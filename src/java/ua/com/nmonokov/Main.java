@@ -47,7 +47,7 @@ public class Main implements FlavorListener {
     // Creates system tray on the startup.
     private void createTray() {
         final PopupMenu popup = new PopupMenu();
-        URL resource = System.class.getResource("/images/bulb16x16.gif");
+        URL resource = ClassLoader.getSystemResource("images/icon.png");
         Image image = Toolkit.getDefaultToolkit().getImage(resource);
         final TrayIcon icon = new TrayIcon(image, "Buffer plus");
         final SystemTray systemTray = SystemTray.getSystemTray();
@@ -66,32 +66,6 @@ public class Main implements FlavorListener {
         } catch (AWTException e) {
             System.out.println("TrayIcon could not be added.");
         }
-
-//        final JPopupMenu popup = new JPopupMenu();
-//        JMenuItem exit = new JMenuItem("Exit");
-//        exit.addActionListener(e -> System.exit(0));
-//
-//        popup.add(new JMenuItem("- empty -"));
-//        popup.addSeparator();
-//        popup.add(exit);
-//
-//        icon.setImageAutoSize(true);
-//        icon.addMouseListener(new MouseAdapter() {
-//            @Override
-//            public void mousePressed(MouseEvent e) {
-//                if (e.isPopupTrigger()) {
-//                    popup.setLocation(e.getX(), e.getY());
-//                    popup.setInvoker(popup);
-//                    popup.setVisible(true);
-//                }
-//            }
-//        });
-//        try {
-//            systemTray.add(icon);
-//        } catch (AWTException e) {
-//            System.out.println("TrayIcon could not be added.");
-//        }
-
     }
 
     // Recreates tray using elements from ITEMS queue.
