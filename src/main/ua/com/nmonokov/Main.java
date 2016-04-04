@@ -13,6 +13,7 @@ import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.FlavorEvent;
 import java.awt.datatransfer.FlavorListener;
+import java.awt.datatransfer.StringSelection;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.IOException;
 import java.net.URL;
@@ -23,7 +24,6 @@ public class Main implements FlavorListener {
     private static final Clipboard CLIPBOARD = Toolkit.getDefaultToolkit().getSystemClipboard();
     private static final int ITEMS_LIMIT = 5;
     private static final Queue<String> ITEMS = new CircularFifoQueue<>(ITEMS_LIMIT);
-    private static boolean isShownPopup = true;
 
     public Main() {
         initUI();
@@ -39,7 +39,7 @@ public class Main implements FlavorListener {
             return;
         }
         // Empty contents to invoke FlavorListener for sure.
-        CLIPBOARD.setContents(CLIPBOARD.getContents(null), (c, e) -> {});
+        CLIPBOARD.setContents(CLIPBOARD.getContents(null), null);
         CLIPBOARD.addFlavorListener(this);
         createTray();
     }
@@ -100,7 +100,14 @@ public class Main implements FlavorListener {
         TrayIcon icon = systemTray.getTrayIcons()[0];
         final PopupMenu popup = new PopupMenu();
         for (String item : ITEMS) {
-            popup.add(item);
+            MenuItem menuItem = new MenuItem(getDisplayedName(item));
+            menuItem.addActionListener(e -> {
+                StringSelection selection = new StringSelection(item);
+                CLIPBOARD.removeFlavorListener(this);
+                CLIPBOARD.setContents(selection, null);
+                CLIPBOARD.addFlavorListener(this);
+            });
+            popup.add(menuItem);
         }
         popup.addSeparator();
         MenuItem exit = new MenuItem("Exit");
@@ -115,12 +122,10 @@ public class Main implements FlavorListener {
         String data = null;
         try {
             data = (String) CLIPBOARD.getData(DataFlavor.stringFlavor);
-        } catch (UnsupportedFlavorException e1) {
-            e1.printStackTrace();
-        } catch (IOException e1) {
+        } catch (UnsupportedFlavorException | IOException e1) {
             e1.printStackTrace();
         }
-        System.out.println(data);
+
         if (!ITEMS.contains(data)) {
             ITEMS.add(data);
             recreateTray();
@@ -128,7 +133,15 @@ public class Main implements FlavorListener {
 
         // Make sure flavoreChanged will invoke only once.
         CLIPBOARD.removeFlavorListener(this);
-        CLIPBOARD.setContents(CLIPBOARD.getContents(null), (clip, event) -> {});
+        CLIPBOARD.setContents(CLIPBOARD.getContents(null), null);
         CLIPBOARD.addFlavorListener(this);
+    }
+
+    private String getDisplayedName(String data) {
+        if (data.length() > 15) {
+            return data.substring(0, 15) + " ...";
+        } else {
+            return data;
+        }
     }
 }
