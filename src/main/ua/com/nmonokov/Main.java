@@ -2,8 +2,13 @@ package ua.com.nmonokov;
 
 import org.apache.commons.collections4.queue.CircularFifoQueue;
 
-import javax.swing.*;
-import java.awt.*;
+import java.awt.AWTException;
+import java.awt.Image;
+import java.awt.MenuItem;
+import java.awt.PopupMenu;
+import java.awt.SystemTray;
+import java.awt.Toolkit;
+import java.awt.TrayIcon;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.FlavorEvent;
@@ -11,13 +16,14 @@ import java.awt.datatransfer.FlavorListener;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.IOException;
 import java.net.URL;
-import java.util.*;
+import java.util.Queue;
 
-public class Main extends JFrame implements FlavorListener {
+public class Main implements FlavorListener {
 
     private static final Clipboard CLIPBOARD = Toolkit.getDefaultToolkit().getSystemClipboard();
     private static final int ITEMS_LIMIT = 5;
     private static final Queue<String> ITEMS = new CircularFifoQueue<>(ITEMS_LIMIT);
+    private static boolean isShownPopup = true;
 
     public Main() {
         initUI();
@@ -60,6 +66,32 @@ public class Main extends JFrame implements FlavorListener {
         } catch (AWTException e) {
             System.out.println("TrayIcon could not be added.");
         }
+
+//        final JPopupMenu popup = new JPopupMenu();
+//        JMenuItem exit = new JMenuItem("Exit");
+//        exit.addActionListener(e -> System.exit(0));
+//
+//        popup.add(new JMenuItem("- empty -"));
+//        popup.addSeparator();
+//        popup.add(exit);
+//
+//        icon.setImageAutoSize(true);
+//        icon.addMouseListener(new MouseAdapter() {
+//            @Override
+//            public void mousePressed(MouseEvent e) {
+//                if (e.isPopupTrigger()) {
+//                    popup.setLocation(e.getX(), e.getY());
+//                    popup.setInvoker(popup);
+//                    popup.setVisible(true);
+//                }
+//            }
+//        });
+//        try {
+//            systemTray.add(icon);
+//        } catch (AWTException e) {
+//            System.out.println("TrayIcon could not be added.");
+//        }
+
     }
 
     // Recreates tray using elements from ITEMS queue.
@@ -99,6 +131,4 @@ public class Main extends JFrame implements FlavorListener {
         CLIPBOARD.setContents(CLIPBOARD.getContents(null), (clip, event) -> {});
         CLIPBOARD.addFlavorListener(this);
     }
-
-
 }
