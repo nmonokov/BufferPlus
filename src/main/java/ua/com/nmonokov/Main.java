@@ -1,7 +1,5 @@
 package ua.com.nmonokov;
 
-import org.apache.commons.collections4.queue.CircularFifoQueue;
-
 import java.awt.AWTException;
 import java.awt.Image;
 import java.awt.MenuItem;
@@ -17,13 +15,12 @@ import java.awt.datatransfer.StringSelection;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.IOException;
 import java.net.URL;
-import java.util.Queue;
 
 public class Main implements FlavorListener {
 
     private static final Clipboard CLIPBOARD = Toolkit.getDefaultToolkit().getSystemClipboard();
     private static final int ITEMS_LIMIT = 5;
-    private static final Queue<String> ITEMS = new CircularFifoQueue<>(ITEMS_LIMIT);
+    private static final CircularQueue<String> ITEMS = new CircularQueue<>(ITEMS_LIMIT);
 
     public Main() {
         initUI();
@@ -73,7 +70,7 @@ public class Main implements FlavorListener {
         SystemTray systemTray = SystemTray.getSystemTray();
         TrayIcon icon = systemTray.getTrayIcons()[0];
         final PopupMenu popup = new PopupMenu();
-        for (String item : ITEMS) {
+        for (String item : ITEMS.getQueue()) {
             MenuItem menuItem = new MenuItem(getDisplayedName(item));
             menuItem.addActionListener(e -> {
                 StringSelection selection = new StringSelection(item);
@@ -100,7 +97,7 @@ public class Main implements FlavorListener {
             e1.printStackTrace();
         }
 
-        if (!ITEMS.contains(data)) {
+        if (!ITEMS.getQueue().contains(data)) {
             ITEMS.add(data);
             recreateTray();
         }
